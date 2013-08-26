@@ -1,5 +1,4 @@
 from setuptools import setup
-from setuptools.command.install import install as _install
 
 
 def readme():
@@ -7,14 +6,7 @@ def readme():
         return f.read()
 
 
-class install(_install):
-    def run(self):
-        _install.run(self)
-
-
-
 setup(
-    cmdclass = {'install' : install},
     name = "isaikootu",
     version = "0.1",
     url = 'http://github.com/tamizhgeek/isaikootu',
