@@ -1,6 +1,9 @@
-from indexer import *
-from models import *
-from searcher import *
+#!/usr/bin/env python
+
+import isaikootu
+from isaikootu.indexer import *
+from isaikootu.models import *
+from isaikootu.searcher import *
 
 import sys
 import os
@@ -45,6 +48,7 @@ class Isaikootu(cmdln.Cmdln):
                 x.add_row([r.name, r.dirpath])
             print_res = print_res +  x.get_string()
             return print_res
+
     # Commands 
         
     @cmdln.option("-d", "--daemonize", action = "store_true", dest = "daemonize", help="Run indexing in background")
