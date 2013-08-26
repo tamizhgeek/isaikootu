@@ -1,0 +1,122 @@
+from indexer import *
+from models import *
+from searcher import *
+
+import sys
+import os
+import logging
+
+import cmdln
+from prettytable import *
+
+class Isaikootu(cmdln.Cmdln):
+    name = "isaikootu"
+    
+    def __init__(self, *args, **kwargs):
+        cmdln.Cmdln.__init__(self, *args, **kwargs)
+        cmdln.Cmdln.do_help.aliases.append("h")
+        self._setup_logging()
+        
+    
+    # Misc methods
+    def _setup_logging(self):
+        logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.ERROR)
+        self.logger = logging.getLogger('isaikootu')
+        
+    
+    def _print_res_to_table(self, res, data, ffilter = "NA"):
+        print_res = "="*80 + "\n"
+        print_res = print_res +  "Filter : %s" % ffilter + "\n"
+        print_res = print_res +  "Data : %s" % data + "\n"
+        print_res = print_res + "="*80 + "\n"
+        if res.count() == 0:
+            print_res = print_res +  "\n"
+            print_res = print_res +  "No matches found!"
+            return print_res
+        else:
+            print_res = print_res +  "\n"
+            print_res = print_res +  "Matches found"
+            print_res = print_res + "\n"
+            x = PrettyTable(['name', 'location'])
+            x.align["name"] = "l"
+            x.align["location"] = "l"
+            x.padding_width = 1
+            for r in res:
+                x.add_row([r.name, r.dirpath])
+            print_res = print_res +  x.get_string()
+            return print_res
+    # Commands 
+        
+    @cmdln.option("-d", "--daemonize", action = "store_true", dest = "daemonize", help="Run indexing in background")
+    @cmdln.option("-p", "--path", help = "Optional directory to index")
+    @cmdln.option("-v", "--verbose", action = "store_true", help = "Be verbose. Print everything!")
+    @cmdln.option("-l", "--logfile", help = "Log to this file, in addition to STDOUT")
+    def do_index(self, subcmd, opts):
+        """${cmd_name}: index the multimedia files in a directory. 
+        By default it indexes the user's home dir.
+      
+        ${cmd_usage}
+
+        ${cmd_option_list}
+        """
+        if opts.logfile:
+            fh = logging.FileHandler(opts.logfile)
+            fh.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+            self.logger.addHandler(fh)
+
+        if opts.verbose:
+            self.logger.setLevel(logging.DEBUG)
+            
+
+        if opts.path:
+            path = opts.path
+        else:
+            path = os.path.expanduser('~')
+                        
+        if opts.daemonize:
+            pass
+        else:
+            indexer = Indexer(path)
+            indexer.index()
+            
+    def do_search(self, subcmd, opts, *args):
+        """${cmd_name}: search the index for multimedia files
+        
+        Usage:
+            $isaikootu search [FILTER] KEYWORD
+            
+            The filter could be any of these attributes:
+               1. name
+               2. title
+               3. album
+               4. artist
+               5. filetype
+            If no filter is given, the search defaults to name field.
+
+        Examples:
+            $isaikootu search artist "Led Zeppelin"
+            $isaikootu search name "Stair Case to Heaven"
+            $isaikootu search "Ilayaraja"
+
+        ${cmd_option_list}
+        """
+        searcher = Searcher()
+        try:
+            if len(args) == 0:
+                self.logger.error("No data given to search")
+                self.logger.error("Type 'isaikootu help search' for usage")
+            elif len(args) == 1:
+                res = searcher.search(args[0])
+                table = self._print_res_to_table(res, args[0], "")
+                print(table)
+            else:
+                res = searcher.search(args[1], args[0])
+                table = self._print_res_to_table(res, args[1], args[0])
+                print table
+        except SearcherError as e:
+            self.logger.error(e)
+
+if __name__ == '__main__':
+    isai = Isaikootu()
+    isai.main()
+    
