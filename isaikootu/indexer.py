@@ -1,11 +1,15 @@
 import os
+import logging
 import datetime
 import md5
 import eyed3
+
+
 from models import *
 
 class Indexer(object):
     def __init__(self, root):
+        self.logger = logging.getLogger('isaikootu.indexer')
         if os.path.exists(root):
             self.root = root
         else:
@@ -13,11 +17,13 @@ class Indexer(object):
         
     # Crawl the filesytem and return a list of matching multimedia files.
     def _files_in_disk(self):
+        self.logger.debug('Crawling the file system please wait...')
         file_list = []
         for root, subfolders, files in os.walk(self.root):
             for ffile in files:
                 if os.path.splitext(ffile)[1] in MFile.extension.choices:
                     file_list.append(os.path.abspath(os.path.join(root,ffile)))
+        self.logger.debug('Done crawling!')
         return file_list
     
     # List of files which are in index
@@ -39,18 +45,17 @@ class Indexer(object):
         self._extract_id3(fname, m)
 
     def _extract_id3(self, fname, mfile):
-        print fname
+        self.logger.debug("Trying to extract ID3 data for %s" % mfile)
         try:
             f = eyed3.load(fname)
-        except Exception, err:
-            print("Error occurred : %s",err)
+        except Exception as err:
+            self.logger.error("Error occurred : %s",err)
             return
         id3 = ID3Tag()
         id3.mfile = mfile
         data_found = False
         if f is None:
             return 
-        print f.tag
         if f.tag is not None:
             id3.title = f.tag.title
             id3.album = f.tag.album
@@ -60,7 +65,6 @@ class Indexer(object):
             id3.length = f.info.time_secs
             data_found = True
         if data_found:
-            print id3
             id3.save()
             return id3
         
@@ -80,13 +84,11 @@ class Indexer(object):
     (l2 - l1) gives me the files which are dead and need to be removed from index
     
     Right now, I am kind of dumb and detect only filesystem changes. If there are changes
-    to multimedia metadata, they aren't detected automatically for reindexing :(
+    to multimedia metadata such as ID3 tags, they aren't detected automatically for reindexing :(
     '''
     def index(self):
         existing_index = self._files_in_index()
         updated_index = self._files_in_disk()
-        print existing_index
-        print updated_index
         s = set(existing_index)
         newfiles = [x for x in updated_index if x not in s]
         s = set(updated_index)
