@@ -16,7 +16,7 @@ setup(
     author = 'Azhagu Selvan',
     packages = ['isaikootu'],
     scripts = ['bin/isaikootu'],
-    install_requires = ['setuptools','peewee', 'prettytable', 'eyed3'],
+    install_requires = ['setuptools>=0.9','peewee', 'prettytable', 'eyed3'],
     zip_safe = False,
     test_suite='nose.collector',
     tests_require=['nose'],
