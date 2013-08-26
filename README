@@ -1,0 +1,23 @@
+Welcome to isaikootu!
+
+This is __very early not even alpha__ python app, which can: 
+ 1. index any directory for music files.
+ 2. search the index.
+
+Basic Usage:
+   To index:      
+
+     $isaikootu index /home/tamizhgeek/Music
+
+   To search:
+
+     $isaikootu search album 'Mariyaan' 
+
+
+To install just extract this dir and type, 'python setup.py install'
+
+To run the tests type, 'python setup.py tests'
+
+The index uses SQLite database and it is located under .isaikootu dir inside your home dir.
+
+Thanks!
