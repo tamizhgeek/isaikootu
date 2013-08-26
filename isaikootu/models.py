@@ -1,7 +1,10 @@
-
+import os
 from peewee import *
 
-db = SqliteDatabase('isaikootu.db')
+if not os.path.exists(os.path.join(os.path.expanduser('~'),'.isaikootu')):
+    os.mkdir(os.path.join(os.path.expanduser('~'),'.isaikootu'))
+
+db = SqliteDatabase(os.path.join(os.path.expanduser('~'),'.isaikootu', 'isaikootu.db'))
 
 class IsaiKootuModel(Model):
     class Meta:
