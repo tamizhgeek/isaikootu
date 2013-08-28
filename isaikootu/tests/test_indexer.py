@@ -25,20 +25,20 @@ class TestIndexer():
     def teardown_class(cls):
         shutil.rmtree('/tmp/test_music_isaikootu')
         
-    def setup(self):
-        with test_database(test_db, (MFile, ID3Tag)):
-            self.indexer = Indexer('/tmp/test_music_isaikootu')
-            self.indexer.index()
+    def setuptestdata(self):
+        self.indexer = Indexer('/tmp/test_music_isaikootu')
+        self.indexer.index()
         
-    def teardown(self):
-        with test_database(test_db, (MFile, ID3Tag)):
-            data = '%test_music_isaikootu%'
-            mfile = MFile.select().where(MFile.fullpath ** data)
-            for m in mfile:
-                m.delete_instance()
+    def teardowntestdata(self):
+        data = '%test_music_isaikootu%'
+        mfile = MFile.select().where(MFile.fullpath ** data)
+        for m in mfile:
+            m.delete_instance()
             
     def test_index(self):
         with test_database(test_db, (MFile, ID3Tag)):
-            MFile.select().where(MFile.name == 'ignore.txt').count == 0
-            MFile.select().where(MFile.extension == 'mp3').count == 0
-            MFile.select().where(MFile.name ** '%Rock%').count == 0
+            self.setuptestdata()
+            assert MFile.select().where(MFile.name == 'ignore.txt').count() == 0
+            assert MFile.select().where(MFile.extension == '.mp3').count() == 1
+            assert MFile.select().where(MFile.name ** '%Rock%').count() == 1
+            self.teardowntestdata()

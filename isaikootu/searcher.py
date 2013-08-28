@@ -8,6 +8,15 @@ class Searcher(object):
     def __init__(self):
         self.allowed_filters = ['title', 'album', 'artist', 'filetype', 'name']
         self.logger = logging.getLogger('isaikootu.searcher')
+        self._type_aliases = {
+            'avi' : ['.avi'],
+            'mp3' : ['.mp3'],
+            'mp4' : ['.mpeg', '.mp4'],
+            'mpeg' : ['.mp4', '.mpeg'],
+            'aac' : ['.aac'],
+            'mkv' : ['.mkv'],
+            'ogg' : ['.ogg']
+            }
 
     ''' I am the main search utility. I get keywords and search criteria and
     do a search on appropiate fields.
@@ -41,7 +50,7 @@ class Searcher(object):
         return mfiles
     
     def _filetype_search(self, data):
-        data = "%%%s%%" %  data
-        mfiles = MFile.select().where(MFile.extension ** data)
+        mfiles = MFile.select().where(MFile.extension << self._type_aliases[data])
         return mfiles
 
+ 
