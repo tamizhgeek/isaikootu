@@ -6,17 +6,29 @@ This is _very early not even alpha_ python app, which can:
 
 Basic Usage:
 ------------
-   *To index:*      
-     ```
-     $isaikootu index /home/tamizhgeek/Music
-     ```  
-   *To search:*
-  ```
-     $isaikootu search album 'Mariyaan' 
-```
-   *For more options:*
-```     $isaikootu help [COMMAND]
-```
+  *To index:*      
+  
+  
+    
+    $isaikootu index /home/tamizhgeek/Music
+    
+    
+    
+  *To search:*
+  
+    
+    
+    $isaikootu search album 'Mariyaan' 
+    
+    
+    
+  *For more options:*
+  
+    
+    
+    $isaikootu help [COMMAND]
+    
+    
 
 
 Current State:
